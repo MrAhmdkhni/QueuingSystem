@@ -2,16 +2,20 @@ package ir.rabin_andisheh.setmeetingtime.service.impl;
 
 import ir.rabin_andisheh.setmeetingtime.base.service.impl.BaseServiceImpl;
 import ir.rabin_andisheh.setmeetingtime.entity.Admin;
+import ir.rabin_andisheh.setmeetingtime.entity.Customer;
 import ir.rabin_andisheh.setmeetingtime.entity.Queuing;
 import ir.rabin_andisheh.setmeetingtime.entity.Visitor;
+import ir.rabin_andisheh.setmeetingtime.exception.CustomerNotFoundException;
 import ir.rabin_andisheh.setmeetingtime.exception.VisitorNotFoundException;
 import ir.rabin_andisheh.setmeetingtime.repository.AdminRepository;
 import ir.rabin_andisheh.setmeetingtime.service.AdminService;
+import ir.rabin_andisheh.setmeetingtime.service.CustomerService;
 import ir.rabin_andisheh.setmeetingtime.service.QueuingService;
 import ir.rabin_andisheh.setmeetingtime.service.VisitorService;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,11 +23,13 @@ public class AdminServiceImpl extends BaseServiceImpl<Admin, Long, AdminReposito
 
     private final VisitorService visitorService;
     private final QueuingService queuingService;
+    private final CustomerService customerService;
 
-    public AdminServiceImpl(AdminRepository repository, VisitorService visitorService, QueuingService queuingService) {
+    public AdminServiceImpl(AdminRepository repository, VisitorService visitorService, QueuingService queuingService, CustomerService customerService) {
         super(repository);
         this.visitorService = visitorService;
         this.queuingService = queuingService;
+        this.customerService = customerService;
     }
 
     @Override
@@ -43,5 +49,21 @@ public class AdminServiceImpl extends BaseServiceImpl<Admin, Long, AdminReposito
             );
             queuingService.saveOrUpdate(newQueuing);
         }
+    }
+
+    @Override
+    public List<Visitor> viewAllVisitor() {
+        List<Visitor> visitors = visitorService.findAll();
+        if (visitors.isEmpty())
+            throw new VisitorNotFoundException("there is no visitor!");
+        return visitors;
+    }
+
+    @Override
+    public List<Customer> viewAllCustomer() {
+        List<Customer> customers = customerService.findAll();
+        if (customers.isEmpty())
+            throw new CustomerNotFoundException("there is no customer!");
+        return customers;
     }
 }
